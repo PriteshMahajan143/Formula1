@@ -1,0 +1,200 @@
+<!DOCTYPE html>
+<html>
+<head>
+<meta charset="UTF-8">
+<title>F1 2026 Race Tracker</title>
+
+<style>
+
+body{
+font-family: Arial;
+background:#0b0f1a;
+color:white;
+padding:30px;
+}
+
+h1{
+color:#ff1e00;
+}
+
+.container{
+display:grid;
+grid-template-columns:350px auto;
+gap:40px;
+}
+
+input,select,textarea{
+width:100%;
+padding:8px;
+margin-top:5px;
+margin-bottom:15px;
+border-radius:6px;
+border:none;
+}
+
+button{
+background:#ff1e00;
+color:white;
+padding:10px;
+border:none;
+border-radius:6px;
+cursor:pointer;
+}
+
+button:hover{
+background:#ff3c1f;
+}
+
+.raceCard{
+background:#151a2c;
+padding:15px;
+border-radius:10px;
+margin-bottom:15px;
+}
+
+.session{
+margin-top:6px;
+font-size:14px;
+}
+
+</style>
+</head>
+
+<body>
+
+<h1>🏁 Formula 1 2026 Race Tracker</h1>
+
+<div class="container">
+
+<div>
+
+<h2>Add Session Result</h2>
+
+<label>Race Name</label>
+<input id="race">
+
+<label>Session Type</label>
+<select id="session">
+<option>FP1</option>
+<option>FP2</option>
+<option>FP3</option>
+<option>Sprint Qualifying</option>
+<option>Sprint Result</option>
+<option>Race Qualifying</option>
+<option>Race Result</option>
+</select>
+
+<label>Result / Notes</label>
+<textarea id="result"></textarea>
+
+<button onclick="addSession()">Save Session</button>
+
+</div>
+
+<div>
+
+<h2>Race Weekend Data</h2>
+
+<div id="raceList"></div>
+
+</div>
+
+</div>
+
+<script type="module">
+
+import { initializeApp } from "https://www.gstatic.com/firebasejs/10.12.2/firebase-app.js";
+
+import {
+getFirestore,
+collection,
+addDoc,
+getDocs,
+query,
+orderBy
+}
+from "https://www.gstatic.com/firebasejs/10.12.2/firebase-firestore.js";
+
+const firebaseConfig = {
+
+apiKey: "YOUR_API_KEY",
+authDomain: "YOUR_DOMAIN",
+projectId: "YOUR_PROJECT_ID",
+storageBucket: "YOUR_BUCKET",
+messagingSenderId: "YOUR_ID",
+appId: "YOUR_APP_ID"
+
+};
+
+const app = initializeApp(firebaseConfig);
+const db = getFirestore(app);
+
+async function addSession(){
+
+const race=document.getElementById("race").value;
+const session=document.getElementById("session").value;
+const result=document.getElementById("result").value;
+
+await addDoc(collection(db,"f1_2026"),{
+
+race:race,
+session:session,
+result:result,
+timestamp:Date.now()
+
+});
+
+loadData();
+
+}
+
+async function loadData(){
+
+const raceList=document.getElementById("raceList");
+raceList.innerHTML="";
+
+const q=query(collection(db,"f1_2026"),orderBy("timestamp"));
+
+const querySnapshot=await getDocs(q);
+
+let races={};
+
+querySnapshot.forEach(doc=>{
+
+const data=doc.data();
+
+if(!races[data.race]){
+races[data.race]=[];
+}
+
+races[data.race].push(data);
+
+});
+
+for(const race in races){
+
+const card=document.createElement("div");
+card.className="raceCard";
+
+let html="<h3>"+race+"</h3>";
+
+races[race].forEach(s=>{
+html+=`<div class="session"><b>${s.session}</b>: ${s.result}</div>`;
+});
+
+card.innerHTML=html;
+
+raceList.appendChild(card);
+
+}
+
+}
+
+loadData();
+
+window.addSession=addSession;
+
+</script>
+
+</body>
+</html>
