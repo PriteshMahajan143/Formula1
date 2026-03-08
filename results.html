@@ -1,0 +1,330 @@
+<!DOCTYPE html>
+<html>
+<head>
+  <title>Race Results Viewer</title>
+  <style>
+    body{
+        font-family: Arial;
+        padding:20px;
+    }
+
+    table{
+        border-collapse: collapse;
+        width: 80%;
+        margin-top:20px;
+    }
+
+    th, td{
+        border:1px solid #ccc;
+        padding:8px;
+        text-align:center;
+    }
+
+    th{
+        background:#111;
+        color:white;
+    }
+  </style>
+</head>
+
+<body>
+
+<h2>Race Weekend Results</h2>
+
+<label>Select Race:</label>
+<select id="raceSelect"></select>
+
+<label>Select Session:</label>
+<select id="sessionSelect">
+<option value="fp1">FP1</option>
+<option value="fp2">FP2</option>
+<option value="fp3">FP3</option>
+<option value="qualifying">Qualifying</option>
+<option value="sprintQualifying">Sprint Qualifying</option>
+<option value="sprint">Sprint</option>
+<option value="race">Race</option>
+</select><!DOCTYPE html>
+<html>
+<head>
+<meta charset="UTF-8">
+<title>F1 Race Results Viewer</title>
+
+<style>
+
+body{
+font-family: Arial;
+background:#0b0f1a;
+color:white;
+padding:30px;
+}
+
+h2{
+color:#ff1e00;
+}
+
+select,button{
+padding:8px;
+margin:10px 10px 20px 0;
+border-radius:6px;
+border:none;
+}
+
+button{
+background:#ff1e00;
+color:white;
+cursor:pointer;
+}
+
+button:hover{
+background:#ff3c1f;
+}
+
+table{
+border-collapse:collapse;
+width:100%;
+background:#151a2c;
+}
+
+th,td{
+border:1px solid #333;
+padding:10px;
+text-align:center;
+}
+
+th{
+background:#111;
+color:white;
+}
+
+tr:nth-child(even){
+background:#1c2136;
+}
+
+</style>
+
+</head>
+
+<body>
+
+<h2>Race Weekend Results</h2>
+
+<label>Select Race:</label>
+<select id="raceSelect"></select>
+
+<label>Select Session:</label>
+<select id="sessionSelect">
+
+<option value="FP1">FP1</option>
+<option value="FP2">FP2</option>
+<option value="FP3">FP3</option>
+<option value="SprintQualifying">Sprint Qualifying</option>
+<option value="SprintRace">Sprint Race</option>
+<option value="Qualifying">Qualifying</option>
+<option value="Race">Race</option>
+
+</select>
+
+<button onclick="loadResults()">Load Results</button>
+
+<table id="resultsTable">
+
+<thead>
+<tr>
+<th>Position</th>
+<th>Driver</th>
+<th>Team</th>
+<th>Points</th>
+</tr>
+</thead>
+
+<tbody></tbody>
+
+</table>
+
+<script type="module">
+
+import { initializeApp } from "https://www.gstatic.com/firebasejs/10.12.2/firebase-app.js";
+
+import {
+getFirestore,
+collection,
+getDocs
+}
+from "https://www.gstatic.com/firebasejs/10.12.2/firebase-firestore.js";
+
+
+const firebaseConfig = {
+
+apiKey: "AIzaSyDKKYg5DzOyj-b4yiZbLZLqki12SIvqn-w",
+authDomain: "formula1-93967.firebaseapp.com",
+projectId: "formula1-93967",
+storageBucket: "formula1-93967.firebasestorage.app",
+messagingSenderId: "605887356094",
+appId: "1:605887356094:web:ea144cee6a249791d612ef",
+measurementId: "G-GZREC19YKH"
+
+};
+
+const app = initializeApp(firebaseConfig);
+const db = getFirestore(app);
+
+
+
+async function loadRaces(){
+
+const racesSnapshot = await getDocs(collection(db,"races"));
+
+const raceSelect = document.getElementById("raceSelect");
+
+raceSelect.innerHTML="";
+
+racesSnapshot.forEach((doc)=>{
+
+const option=document.createElement("option");
+
+option.value=doc.id;
+option.text=doc.id.replaceAll("_"," ").toUpperCase();
+
+raceSelect.appendChild(option);
+
+});
+
+}
+
+loadRaces();
+
+
+
+async function loadResults(){
+
+const race=document.getElementById("raceSelect").value;
+const session=document.getElementById("sessionSelect").value;
+
+const snapshot=await getDocs(
+collection(db,"races",race,"sessions",session,"results")
+);
+
+const tableBody=document.querySelector("#resultsTable tbody");
+
+tableBody.innerHTML="";
+
+let results=[];
+
+snapshot.forEach(doc=>{
+
+results.push(doc.data());
+
+});
+
+results.sort((a,b)=>a.position-b.position);
+
+results.forEach(data=>{
+
+const row=document.createElement("tr");
+
+row.innerHTML=`
+
+<td>${data.position}</td>
+<td>${data.driver}</td>
+<td>${data.team}</td>
+<td>${data.points || "-"}</td>
+
+`;
+
+tableBody.appendChild(row);
+
+});
+
+}
+
+window.loadResults=loadResults;
+
+</script>
+
+</body>
+</html>
+
+<button onclick="loadResults()">Load Results</button>
+
+<table id="resultsTable">
+<thead>
+<tr>
+<th>Position</th>
+<th>Driver</th>
+<th>Team</th>
+<th>Points</th>
+</tr>
+</thead>
+
+<tbody></tbody>
+
+</table>
+
+<script type="module">
+
+import { initializeApp } from "https://www.gstatic.com/firebasejs/10.12.2/firebase-app.js";
+import { getFirestore, collection, getDocs } from "https://www.gstatic.com/firebasejs/10.12.2/firebase-firestore.js";
+
+const firebaseConfig = {
+   // your config
+};
+
+const app = initializeApp(firebaseConfig);
+const db = getFirestore(app);
+
+async function loadRaces(){
+
+    const races = await getDocs(collection(db,"races"));
+
+    const raceSelect = document.getElementById("raceSelect");
+
+    races.forEach((doc)=>{
+
+        const option = document.createElement("option");
+        option.value = doc.id;
+        option.text = doc.id;
+
+        raceSelect.appendChild(option);
+
+    });
+}
+
+loadRaces();
+
+async function loadResults(){
+
+    const race = document.getElementById("raceSelect").value;
+    const session = document.getElementById("sessionSelect").value;
+
+    const snapshot = await getDocs(collection(db,"races",race,session));
+
+    const tableBody = document.querySelector("#resultsTable tbody");
+    tableBody.innerHTML="";
+
+    let results = [];
+
+    snapshot.forEach(doc=>{
+        results.push(doc.data());
+    });
+
+    // sort by position
+    results.sort((a,b)=> a.position - b.position);
+
+    results.forEach(data=>{
+
+        const row = document.createElement("tr");
+
+        row.innerHTML = `
+        <td>${data.position}</td>
+        <td>${data.driver}</td>
+        <td>${data.team}</td>
+        <td>${data.points || "-"}</td>
+        `;
+
+        tableBody.appendChild(row);
+
+    });
+
+}
+</body>
+</html>
