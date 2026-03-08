@@ -70,22 +70,61 @@ font-size:14px;
 
 <h2>Add Session Result</h2>
 
-<label>Race Name</label>
-<input id="race">
+<label>Select Race</label>
 
-<label>Session Type</label>
-<select id="session">
-<option>FP1</option>
-<option>FP2</option>
-<option>FP3</option>
-<option>Sprint Qualifying</option>
-<option>Sprint Result</option>
-<option>Race Qualifying</option>
-<option>Race Result</option>
+<select id="raceSelect">
+<option value="">Select Race</option>
+<option value="australian_gp">Australian GP</option>
+<option value="chinese_gp">Chinese GP</option>
+<option value="japanese_gp">Japanese GP</option>
+<option value="bahrain_gp">Bahrain GP</option>
+<option value="saudi_arabian_gp">Saudi Arabian GP</option>
+<option value="miami_gp">Miami GP</option>
+<option value="canadian_gp">Canadian GP</option>
+<option value="monaco_gp">Monaco GP</option>
+<option value="barcelona_gp">Barcelona GP</option>
+<option value="austrian_gp">Austrian GP</option>
+<option value="british_gp">British GP</option>
+<option value="belgian_gp">Belgian GP</option>
+<option value="hungarian_gp">Hungarian GP</option>
+<option value="dutch_gp">Dutch GP</option>
+<option value="italian_gp">Italina GP</option>
+<option value="spanish_gp">Spanish GP</option>
+<option value="azerbaijan_gp">Azerbaijan GP</option>
+<option value="singapore_gp">Singapore GP</option>
+<option value="united_states_gp">United States GP</option>
+<option value="mexican_gp">Mexican GP</option>
+<option value="brazilian_gp">Brazilian GP</option>
+<option value="las_vegas_gp">Las Vegas GP</option>
+<option value="qatar_gp">Qatar GP</option>
+<option value="abu_dhabi_gp">Abu Dhabi GP</option>
 </select>
 
-<label>Result / Notes</label>
-<textarea id="result"></textarea>
+<label>Sprint Weekend?</label>
+<input type="checkbox" id="sprintToggle">
+  
+<label>Select Session</label>
+
+<select id="sessionSelect">
+<option value="FP1">FP1</option>
+<option value="FP2">FP2</option>
+<option value="FP3">FP3</option>
+<option value="SprintQualifying" class="sprintSession">Sprint Qualifying</option>
+<option value="SprintRace" class="sprintSession">Sprint Race</option>
+<option value="Qualifying">Qualifying</option>
+<option value="Race">Race</option>
+</select>
+
+<table id="resultsTable">
+
+<tr>
+<th>Position</th>
+<th>Driver</th>
+<th>Team</th>
+<th>Points</th>
+</tr>
+
+</table>
 
 <button onclick="addSession()">Save Session</button>
 
@@ -125,23 +164,101 @@ const firebaseConfig = {
   measurementId: "G-GZREC19YKH"
 };
 
+const drivers=[
+  "Max Verstappen",
+  "Sergio Perez",
+  "Lewis Hamilton",
+  "George Russell",
+  "Charles Leclerc",
+  "Carlos Sainz",
+  "Lando Norris",
+  "Oscar Piastri",
+  "Fernando Alonso",
+  "Lance Stroll",
+  "Pierre Gasly",
+  "Esteban Ocon",
+  "Arvid Lindblad",
+  "Isack Hadjar",
+  "Valtteri Bottas",
+  "Liam Lawson",
+  "Alex Albon",
+  "Kimi Antonelli",
+  "Oliver Bearman",
+  "Nico Hulkenberg",
+  "Gabriel Bortoleto",
+  "Franco Colapinto"
+];
+
+const table=document.getElementById("resultsTable");
+
+drivers.forEach((d,i)=>{
+
+let row=table.insertRow();
+
+row.innerHTML=`
+<td>${i+1}</td>
+<td>${d}</td>
+<td><input></td>
+<td><input></td>
+`;
+
+});
+
 const app = initializeApp(firebaseConfig);
 const db = getFirestore(app);
 
+// Sprint toggle logic
+
+const sprintToggle=document.getElementById("sprintToggle");
+
+sprintToggle.addEventListener("change",()=>{
+
+const sprintOptions=document.querySelectorAll(".sprintSession");
+
+sprintOptions.forEach(opt=>{
+opt.style.display = sprintToggle.checked ? "block" : "none";
+});
+
+});
+
+document.querySelectorAll(".sprintSession").forEach(opt=>{
+opt.style.display="none";
+});
+
 async function addSession(){
 
-const race=document.getElementById("race").value;
-const session=document.getElementById("session").value;
-const result=document.getElementById("result").value;
+const race=document.getElementById("raceSelect").value;
+const session=document.getElementById("sessionSelect").value;
 
-await addDoc(collection(db,"f1_2026"),{
+if(!race){
+alert("Please select a race");
+return;
+}
 
-race:race,
+const rows=document.querySelectorAll("#resultsTable tr");
+
+rows.forEach(async(row,i)=>{
+
+if(i===0) return;
+
+const driver=row.cells[1].innerText;
+const team=row.cells[2].querySelector("input").value;
+const points=row.cells[3].querySelector("input").value;
+
+await addDoc(collection(db,race,"results"),{
+
 session:session,
-result:result,
+position:i,
+driver:driver,
+team:team,
+points:points,
 timestamp:Date.now()
 
 });
+
+});
+
+alert("Session saved successfully!");
 
 loadData();
 
@@ -152,33 +269,52 @@ async function loadData(){
 const raceList=document.getElementById("raceList");
 raceList.innerHTML="";
 
-const q=query(collection(db,"f1_2026"),orderBy("timestamp"));
+const races=[
+"australian_gp",
+"chinese_gp",
+"japanese_gp",
+"bahrain_gp",
+"saudi_arabian_gp",
+"miami_gp",
+"canadian_gp",
+"monaco_gp",
+"barcelona_gp",
+"austrian_gp",
+"british_gp",
+"belgian_gp",
+"hungarian_gp",
+"dutch_gp",
+"italian_gp",
+"spanish_gp",
+"azerbaijan_gp",
+"singapore_gp",
+"united_states_gp",
+"mexican_gp",
+"brazilian_gp",
+"las_vegas_gp",
+"qatar_gp",
+"abu_dhabi_gp"
+];
 
-const querySnapshot=await getDocs(q);
+for(const race of races){
 
-let races={};
+const snapshot=await getDocs(collection(db,"races",race,"results"));
 
-querySnapshot.forEach(doc=>{
-
-const data=doc.data();
-
-if(!races[data.race]){
-races[data.race]=[];
-}
-
-races[data.race].push(data);
-
-});
-
-for(const race in races){
+if(snapshot.empty) continue;
 
 const card=document.createElement("div");
 card.className="raceCard";
 
-let html="<h3>"+race+"</h3>";
+let html="<h3>"+race.replaceAll("_"," ").toUpperCase()+"</h3>";
 
-races[race].forEach(s=>{
-html+=`<div class="session"><b>${s.session}</b>: ${s.result}</div>`;
+snapshot.forEach(doc=>{
+
+const d=doc.data();
+
+html+=`<div class="session">
+${d.session} — ${d.position}. ${d.driver} (${d.team}) ${d.points} pts
+</div>`;
+
 });
 
 card.innerHTML=html;
