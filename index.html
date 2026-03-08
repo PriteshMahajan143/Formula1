@@ -318,18 +318,22 @@ raceList.appendChild(card);
 
 loadData();
 
-const table=document.getElementById("resultsTable");
+document.addEventListener("DOMContentLoaded", function () {
 
-drivers.forEach((d,i)=>{
+const table = document.getElementById("resultsTable");
 
-let row=table.insertRow();
+drivers.forEach((driver, i) => {
 
-row.innerHTML=`
+let row = table.insertRow();
+
+row.innerHTML = `
 <td>${i+1}</td>
-<td>${d}</td>
+<td>${driver}</td>
 <td><input placeholder="Team"></td>
 <td><input type="number" placeholder="Points"></td>
 `;
+
+});
 
 });
   
