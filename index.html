@@ -189,21 +189,6 @@ const drivers=[
   "Franco Colapinto"
 ];
 
-const table=document.getElementById("resultsTable");
-
-drivers.forEach((d,i)=>{
-
-let row=table.insertRow();
-
-row.innerHTML=`
-<td>${i+1}</td>
-<td>${d}</td>
-<td><input></td>
-<td><input></td>
-`;
-
-});
-
 const app = initializeApp(firebaseConfig);
 const db = getFirestore(app);
 
@@ -333,6 +318,21 @@ raceList.appendChild(card);
 
 loadData();
 
+const table=document.getElementById("resultsTable");
+
+drivers.forEach((d,i)=>{
+
+let row=table.insertRow();
+
+row.innerHTML=`
+<td>${i+1}</td>
+<td>${d}</td>
+<td><input placeholder="Team"></td>
+<td><input type="number" placeholder="Points"></td>
+`;
+
+});
+  
 window.addSession=addSession;
 
 </script>
