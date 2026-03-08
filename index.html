@@ -149,8 +149,8 @@ getFirestore,
 collection,
 addDoc,
 getDocs,
-query,
-orderBy
+doc,
+setDoc
 }
 from "https://www.gstatic.com/firebasejs/10.12.2/firebase-firestore.js";
 
@@ -234,7 +234,13 @@ if(!race){
 alert("Please select a race");
 return;
 }
+import { doc,setDoc } from "https://www.gstatic.com/firebasejs/10.12.2/firebase-firestore.js";
 
+await setDoc(doc(db,"races",race),{
+raceName: race,
+sprint: document.getElementById("sprintToggle").checked
+},{merge:true});
+  
 const rows=document.querySelectorAll("#resultsTable tr");
 
 rows.forEach(async(row,i)=>{
@@ -245,7 +251,7 @@ const driver=row.cells[1].innerText;
 const team=row.cells[2].querySelector("input").value;
 const points=row.cells[3].querySelector("input").value;
 
-await addDoc(collection(db,race,"results"),{
+await addDoc(collection(db,"races",race,"sessions",session,"results"),{
 
 session:session,
 position:i,
@@ -298,7 +304,7 @@ const races=[
 
 for(const race of races){
 
-const snapshot=await getDocs(collection(db,"races",race,"results"));
+const snapshot=await getDocs(collection(db,"races",race,"sessions","Race","results"));
 
 if(snapshot.empty) continue;
 
