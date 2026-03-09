@@ -424,7 +424,7 @@ opt.style.display = sprintToggle.checked ? "block" : "none";
 });
 
 document.querySelectorAll(".sprintSession").forEach(opt=>{
-opt.style.display="inline";
+opt.style.display="none";
 });
 
 const racePoints = {
@@ -658,8 +658,44 @@ const driverTeams={
 document.addEventListener("DOMContentLoaded", function () {
 
 const table = document.getElementById("resultsTable");
+const selects = [];
 
-drivers.forEach((driver, i) => {
+function updateDriverAvailability(){
+
+const selectedDrivers = selects
+.map(s => s.getValue())
+.filter(v => v !== "");
+
+selects.forEach(s => {
+
+const current = s.getValue();
+
+s.clearOptions(false);
+
+s.addOption({
+value:"",
+text:"Select Driver"
+});
+
+drivers.forEach(d => {
+
+if(!selectedDrivers.includes(d) || d === current){
+s.addOption({value:d,text:d});
+}
+
+});
+
+s.refreshOptions(false);
+
+if(current){
+s.setValue(current,true);
+}
+  
+});
+
+}
+  
+for (let i = 0; i < 5; i++) {
 
 let row = table.insertRow();
 
@@ -690,11 +726,14 @@ option.text=d;
 select.appendChild(option);
 });
 
-new TomSelect(select,{
+const ts = new TomSelect(select,{
 create:false,
 sortField:"text",
-placeholder:"Search Driver..."
+placeholder:"Search Driver...",
+maxOptions:22
 });
+
+selects.push(ts);
   
 select.addEventListener("change",()=>{
 
@@ -702,10 +741,11 @@ const team=row.querySelector(".teamInput");
 
 team.value = driverTeams[select.value] || "";
 
+updateDriverAvailability();  
 });  
   
 });
-
+updateDriverAvailability();
 });
   
 window.addSession=addSession;
