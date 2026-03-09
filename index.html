@@ -5,58 +5,193 @@
 <title>F1 2026 Race Tracker</title>
 
 <style>
+/* Google Font */
+@import url('https://fonts.googleapis.com/css2?family=Orbitron:wght@400;600&family=Inter:wght@300;400;500&display=swap');
+
+:root{
+--f1-red:#ff1e00;
+--f1-dark:#0b0f1a;
+--card-bg:#121726;
+--card-glow:rgba(255,30,0,0.2);
+--border-soft:rgba(255,255,255,0.06);
+}
+
+*{
+box-sizing:border-box;
+}
 
 body{
-font-family: Arial;
-background:#0b0f1a;
+font-family:Inter,Arial;
+background:
+linear-gradient(rgba(10,10,20,.95),rgba(10,10,20,.95)),
+repeating-linear-gradient(
+90deg,
+rgba(255,255,255,0.02) 0px,
+rgba(255,255,255,0.02) 1px,
+transparent 1px,
+transparent 80px
+),
+#0b0f1a;
 color:white;
-padding:30px;
+padding:40px;
 }
 
+/* Title */
+
 h1{
-color:#ff1e00;
+font-family:Orbitron;
+color:var(--f1-red);
+font-size:40px;
+letter-spacing:2px;
+margin-bottom:30px;
+text-shadow:0 0 15px rgba(255,30,0,.6);
 }
+
+h2{
+font-family:Orbitron;
+font-weight:500;
+margin-bottom:15px;
+letter-spacing:1px;
+}
+
+/* Layout */
 
 .container{
 display:grid;
-grid-template-columns:350px auto;
-gap:40px;
+grid-template-columns:360px auto;
+gap:50px;
+align-items:start;
 }
+
+/* Panels */
+
+.container > div{
+background:var(--card-bg);
+padding:25px;
+border-radius:14px;
+border:1px solid var(--border-soft);
+box-shadow:
+0 10px 25px rgba(0,0,0,.6),
+0 0 25px var(--card-glow);
+backdrop-filter: blur(10px);
+}
+
+/* Inputs */
 
 input,select,textarea{
 width:100%;
-padding:8px;
+padding:10px 12px;
 margin-top:5px;
-margin-bottom:15px;
-border-radius:6px;
-border:none;
+margin-bottom:16px;
+border-radius:8px;
+border:1px solid var(--border-soft);
+background:#0e1322;
+color:white;
+font-size:14px;
+transition:all .2s ease;
 }
 
+input:focus,select:focus{
+outline:none;
+border-color:var(--f1-red);
+box-shadow:0 0 10px rgba(255,30,0,.5);
+}
+
+/* Button */
+
 button{
-background:#ff1e00;
+background:linear-gradient(45deg,#ff1e00,#ff4a2f);
 color:white;
-padding:10px;
+padding:11px;
 border:none;
-border-radius:6px;
+border-radius:8px;
+font-weight:600;
+letter-spacing:.5px;
 cursor:pointer;
+transition:all .25s ease;
+box-shadow:0 0 12px rgba(255,30,0,.4);
 }
 
 button:hover{
-background:#ff3c1f;
+transform:translateY(-2px);
+box-shadow:0 0 18px rgba(255,30,0,.7);
 }
 
+/* Table */
+
+table{
+width:100%;
+border-collapse:collapse;
+margin-bottom:20px;
+}
+
+th{
+text-align:left;
+font-size:13px;
+padding:10px;
+color:#ff7a65;
+border-bottom:1px solid var(--border-soft);
+}
+
+td{
+padding:8px;
+border-bottom:1px solid rgba(255,255,255,0.03);
+}
+
+/* Race cards */
+
 .raceCard{
-background:#151a2c;
-padding:15px;
-border-radius:10px;
+background:linear-gradient(145deg,#121726,#0e1220);
+padding:18px;
+border-radius:12px;
 margin-bottom:15px;
+border:1px solid var(--border-soft);
+transition:all .25s ease;
+position:relative;
+overflow:hidden;
+}
+
+.raceCard::before{
+content:"";
+position:absolute;
+top:0;
+left:0;
+width:4px;
+height:100%;
+background:var(--f1-red);
+box-shadow:0 0 10px var(--f1-red);
+}
+
+.raceCard:hover{
+transform:translateY(-4px);
+box-shadow:
+0 10px 20px rgba(0,0,0,.6),
+0 0 25px rgba(255,30,0,.35);
+}
+
+.raceCard h3{
+font-family:Orbitron;
+font-size:18px;
+margin-bottom:8px;
+letter-spacing:1px;
 }
 
 .session{
 margin-top:6px;
-font-size:14px;
+font-size:13px;
+color:#d0d3ff;
 }
 
+/* Scrollbar */
+
+::-webkit-scrollbar{
+width:8px;
+}
+
+::-webkit-scrollbar-thumb{
+background:var(--f1-red);
+border-radius:10px;
+}
 </style>
 </head>
 
