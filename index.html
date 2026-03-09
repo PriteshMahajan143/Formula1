@@ -3,7 +3,8 @@
 <head>
 <meta charset="UTF-8">
 <title>F1 2026 Race Tracker</title>
-
+<link href="https://cdn.jsdelivr.net/npm/tom-select/dist/css/tom-select.css" rel="stylesheet">
+<script src="https://cdn.jsdelivr.net/npm/tom-select/dist/js/tom-select.complete.min.js"></script>
 <style>
 /* Google Font */
 @import url('https://fonts.googleapis.com/css2?family=Orbitron:wght@400;600&family=Inter:wght@300;400;500&display=swap');
@@ -347,6 +348,30 @@ document.querySelectorAll(".sprintSession").forEach(opt=>{
 opt.style.display="none";
 });
 
+const racePoints = {
+1:25,
+2:18,
+3:15,
+4:12,
+5:10,
+6:8,
+7:6,
+8:4,
+9:2,
+10:1
+};
+
+const sprintPoints = {
+1:8,
+2:7,
+3:6,
+4:5,
+5:4,
+6:3,
+7:2,
+8:1
+};
+
 async function addSession(){
 
 const race=document.getElementById("raceSelect").value;
@@ -364,11 +389,51 @@ sprint: document.getElementById("sprintToggle").checked
   
 const rows=document.querySelectorAll("#resultsTable tr");
 
-rows.forEach(async(row,i)=>{
+for(let i=1;i<rows.length;i++){
 
-if(i===0) return;
+const row=rows[i];
 
 const driver=row.cells[1].querySelector("select").value;
+
+if(!driver){
+alert("Please select a driver for position " + i);
+return;
+}
+
+const team=row.cells[2].querySelector("input").value;
+
+let points=0;
+
+if(session==="Race"){
+points = racePoints[i] || 0;
+row.cells[3].querySelector("input").value = points;
+}
+
+if(session==="SprintRace"){
+points = sprintPoints[i] || 0;
+row.cells[3].querySelector("input").value = points;
+}
+
+await addDoc(collection(db,"2026_races",race,"sessions",session,"results"),{
+
+session:session,
+position:i,
+driver:driver,
+team:team,
+points:points,
+timestamp:Date.now()
+
+});
+
+}
+
+const driver=row.cells[1].querySelector("select").value;
+
+if(!driver){
+alert("Please select a driver for position " + i);
+return;
+}
+  
 const team=row.cells[2].querySelector("input").value;
 let points = 0;
 
@@ -412,7 +477,7 @@ i.value="";
 
 }
 
-});  
+}); 
   
 }
 
@@ -526,11 +591,23 @@ let row = table.insertRow();
 
 row.innerHTML =
 "<td>" + (i+1) + "</td>" +
-"<td><select class='driverSelect' placeholder='Select Driver'></select></td>" +
+"<td><select class='driverSelect'></select></td>" +
 "<td><input class='teamInput' readonly></td>" +
 "<td><input type='number' placeholder='Points'></td>";
 
 const select=row.querySelector(".driverSelect");
+
+/* Placeholder option */
+
+let placeholder=document.createElement("option");
+placeholder.text="Select Driver";
+placeholder.value="";
+placeholder.disabled=true;
+placeholder.selected=true;
+
+select.appendChild(placeholder);
+
+/* Driver list */
 
 drivers.forEach(d=>{
 let option=document.createElement("option");
@@ -539,6 +616,12 @@ option.text=d;
 select.appendChild(option);
 });
 
+new TomSelect(select,{
+create:false,
+sortField:"text",
+placeholder:"Search Driver..."
+});
+  
 select.addEventListener("change",()=>{
 
 const team=row.querySelector(".teamInput");
