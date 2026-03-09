@@ -1,0 +1,171 @@
+<!DOCTYPE html>
+<html>
+<head>
+<meta charset="UTF-8">
+<title>F1 2026 Championship</title>
+
+<style>
+
+body{
+font-family:Arial;
+background:#0b0f1a;
+color:white;
+padding:40px;
+}
+
+h1{
+color:#ff1e00;
+}
+
+table{
+width:600px;
+border-collapse:collapse;
+margin-top:20px;
+}
+
+th,td{
+padding:12px;
+border-bottom:1px solid #333;
+text-align:left;
+}
+
+th{
+color:#ff1e00;
+}
+
+tr:hover{
+background:#151a2c;
+}
+
+</style>
+</head>
+
+<body>
+
+<h1>🏆 2026 Driver Championship</h1>
+
+<table id="standings">
+
+<tr>
+<th>Position</th>
+<th>Driver</th>
+<th>Team</th>
+<th>Points</th>
+</tr>
+
+</table>
+
+<script type="module">
+
+import { initializeApp } from "https://www.gstatic.com/firebasejs/10.12.2/firebase-app.js";
+
+import {
+getFirestore,
+collection,
+getDocs
+}
+from "https://www.gstatic.com/firebasejs/10.12.2/firebase-firestore.js";
+
+const firebaseConfig = {
+apiKey:"AIzaSyDKKYg5DzOyj-b4yiZbLZLqki12SIvqn-w",
+authDomain:"formula1-93967.firebaseapp.com",
+projectId:"formula1-93967",
+storageBucket:"formula1-93967.firebasestorage.app",
+messagingSenderId:"605887356094",
+appId:"1:605887356094:web:ea144cee6a249791d612ef"
+};
+
+const app=initializeApp(firebaseConfig);
+const db=getFirestore(app);
+
+const driversPoints={};
+
+const races=[
+"australian_gp",
+"chinese_gp",
+"japanese_gp",
+"bahrain_gp",
+"saudi_arabian_gp",
+"miami_gp",
+"canadian_gp",
+"monaco_gp",
+"barcelona_gp",
+"austrian_gp",
+"british_gp",
+"belgian_gp",
+"hungarian_gp",
+"dutch_gp",
+"italian_gp",
+"spanish_gp",
+"azerbaijan_gp",
+"singapore_gp",
+"united_states_gp",
+"mexican_gp",
+"brazilian_gp",
+"las_vegas_gp",
+"qatar_gp",
+"abu_dhabi_gp"
+];
+
+async function loadStandings(){
+
+for(const race of races){
+
+const sessions=["Race","SprintRace"];
+
+for(const s of sessions){
+
+const snap=await getDocs(collection(db,"2026_races",race,"sessions",s,"results"));
+
+snap.forEach(doc=>{
+
+const d=doc.data();
+
+if(!driversPoints[d.driver]){
+
+driversPoints[d.driver]={
+team:d.team,
+points:0
+};
+
+}
+
+driversPoints[d.driver].points+=Number(d.points);
+
+});
+
+}
+
+}
+
+renderTable();
+
+}
+
+function renderTable(){
+
+const table=document.getElementById("standings");
+
+const sorted=Object.entries(driversPoints)
+.sort((a,b)=>b[1].points-a[1].points);
+
+sorted.forEach((d,i)=>{
+
+const row=table.insertRow();
+
+row.innerHTML=
+"<td>"+(i+1)+"</td>"+
+"<td>"+d[0]+"</td>"+
+"<td>"+d[1].team+"</td>"+
+"<td>"+d[1].points+"</td>";
+
+});
+
+}
+
+loadStandings();
+
+</script>
+
+</body>
+</html>
