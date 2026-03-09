@@ -345,7 +345,7 @@ opt.style.display = sprintToggle.checked ? "block" : "none";
 });
 
 document.querySelectorAll(".sprintSession").forEach(opt=>{
-opt.style.display="none";
+opt.style.display="inline";
 });
 
 const racePoints = {
@@ -387,7 +387,7 @@ raceName: race,
 sprint: document.getElementById("sprintToggle").checked
 },{merge:true});
   
-const rows=document.querySelectorAll("#resultsTable tr");
+const rows=document.querySelectorAll("#resultsTable tr:not(:first-child)");
 
 for(let i=1;i<rows.length;i++){
 
@@ -427,58 +427,9 @@ timestamp:Date.now()
 
 }
 
-const driver=row.cells[1].querySelector("select").value;
-
-if(!driver){
-alert("Please select a driver for position " + i);
-return;
-}
-  
-const team=row.cells[2].querySelector("input").value;
-let points = 0;
-
-if(session === "Race" || session === "SprintRace"){
-points = row.cells[3].querySelector("input").value;
-}
-
-await addDoc(collection(db,"2026_races",race,"sessions",session,"results"),{
-
-session:session,
-position:i,
-driver:driver,
-team:team,
-points:points,
-timestamp:Date.now()
-
-});
-
-});
-
 alert("Session saved successfully!");
 
-loadData();
-
-const sessionSelect=document.getElementById("sessionSelect");
-
-sessionSelect.addEventListener("change",()=>{
-
-const inputs=document.querySelectorAll("#resultsTable input[type='number']");
-
-if(sessionSelect.value==="Race" || sessionSelect.value==="SprintRace"){
-
-inputs.forEach(i=>i.disabled=false);
-
-}else{
-
-inputs.forEach(i=>{
-i.disabled=true;
-i.value="";
-});
-
-}
-
-}); 
-  
+loadData();  
 }
 
 async function loadData(){
@@ -544,6 +495,28 @@ raceList.appendChild(card);
 
 loadData();
 
+const sessionSelect=document.getElementById("sessionSelect");
+
+sessionSelect.addEventListener("change",()=>{
+
+const inputs=document.querySelectorAll("#resultsTable input[type='number']");
+
+if(sessionSelect.value==="Race" || sessionSelect.value==="SprintRace"){
+
+inputs.forEach(i=>i.disabled=false);
+
+}else{
+
+inputs.forEach(i=>{
+i.disabled=true;
+i.value="";
+});
+
+}
+
+}); 
+
+  
 const driverTeams={
 
 "Max Verstappen":"Red Bull Racing",
@@ -593,7 +566,7 @@ row.innerHTML =
 "<td>" + (i+1) + "</td>" +
 "<td><select class='driverSelect'></select></td>" +
 "<td><input class='teamInput' readonly></td>" +
-"<td><input type='number' placeholder='Points'></td>";
+"<td><input type='number' placeholder='Points' disabled></td>";
 
 const select=row.querySelector(".driverSelect");
 
