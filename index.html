@@ -182,7 +182,70 @@ margin-top:6px;
 font-size:13px;
 color:#d0d3ff;
 }
+  
+#resultsTable th{
+font-size:14px;
+padding:12px;
+}
 
+#resultsTable td{
+padding:10px;
+}
+
+#resultsTable input[type="number"]{
+width:90px;
+font-size:14px;
+}
+
+#resultsTable{
+table-layout:fixed;
+}
+
+#resultsTable td,
+#resultsTable th{
+overflow:hidden;
+text-overflow:ellipsis;
+white-space:nowrap;
+}
+  
+#resultsTable th:nth-child(2){
+width:280px;
+}
+
+#resultsTable th:nth-child(3){
+width:240px;
+}
+
+#resultsTable th:nth-child(4){
+width:100px;
+}
+
+#resultsTable tr:hover{
+background:rgba(255,255,255,0.04);
+}
+
+.driverSelect{
+width:260px;
+font-size:14px;
+}
+
+.ts-control{
+width:260px;
+font-size:14px;
+}
+
+.ts-wrapper{
+width:260px;
+}
+  
+.teamInput{
+width:100%;
+font-size:14px;
+background:#141a30;
+color:#9fb3ff;
+font-weight:500;
+}
+  
 /* Scrollbar */
 
 ::-webkit-scrollbar{
@@ -200,14 +263,15 @@ border-radius:10px;
 
 <h1>🏁 Formula 1 2026 Race Tracker</h1>
 
+<a href="championship.html">
+  <button>View Championship Standings</button>
+</a>
+  
 <div class="container">
 
 <div>
 
 <h2>Add Session Result</h2>
-<a href="results.html">
-  <button>View Race Results</button>
-</a>
 <label>Select Race</label>
 
 <select id="raceSelect">
@@ -389,7 +453,7 @@ sprint: document.getElementById("sprintToggle").checked
   
 const rows=document.querySelectorAll("#resultsTable tr:not(:first-child)");
 
-for(let i=1;i<rows.length;i++){
+for(let i=0;i<rows.length;i++){
 
 const row=rows[i];
 
@@ -405,19 +469,19 @@ const team=row.cells[2].querySelector("input").value;
 let points=0;
 
 if(session==="Race"){
-points = racePoints[i] || 0;
+points = racePoints[i+1] || 0;
 row.cells[3].querySelector("input").value = points;
 }
 
 if(session==="SprintRace"){
-points = sprintPoints[i] || 0;
+points = sprintPoints[i+1] || 0;
 row.cells[3].querySelector("input").value = points;
 }
 
 await addDoc(collection(db,"2026_races",race,"sessions",session,"results"),{
 
 session:session,
-position:i,
+position:i+1,
 driver:driver,
 team:team,
 points:points,
