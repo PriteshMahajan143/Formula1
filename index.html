@@ -59,7 +59,7 @@ letter-spacing:1px;
 
 .container{
 display:grid;
-grid-template-columns:500px auto;
+grid-template-columns:750px auto;
 gap:40px;
 align-items:start;
 }
@@ -475,7 +475,7 @@ const row=rows[i];
 const driver=row.cells[1].querySelector("select").value;
 
 if(!driver){
-alert("Please select a driver for position " + i);
+alert("Please select a driver for position " + (i+1));
 return;
 }
 
@@ -578,22 +578,44 @@ const sessionSelect=document.getElementById("sessionSelect");
 
 sessionSelect.addEventListener("change",()=>{
 
-const inputs=document.querySelectorAll("#resultsTable input[type='number']");
+const rows=document.querySelectorAll("#resultsTable tr:not(:first-child)");
 
 if(sessionSelect.value==="Race" || sessionSelect.value==="SprintRace"){
 
-inputs.forEach(i=>i.disabled=false);
+rows.forEach((row,index)=>{
+
+const input=row.cells[3].querySelector("input");
+
+input.disabled=false;
+
+let points=0;
+
+if(sessionSelect.value==="Race"){
+points = racePoints[index+1] || 0;
+}
+
+if(sessionSelect.value==="SprintRace"){
+points = sprintPoints[index+1] || 0;
+}
+
+input.value = points;
+
+});
 
 }else{
 
-inputs.forEach(i=>{
-i.disabled=true;
-i.value="";
+rows.forEach(row=>{
+
+const input=row.cells[3].querySelector("input");
+
+input.disabled=true;
+input.value="";
+
 });
 
 }
 
-}); 
+});
 
   
 const driverTeams={
