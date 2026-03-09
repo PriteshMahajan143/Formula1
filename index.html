@@ -222,7 +222,7 @@ alert("Please select a race");
 return;
 }
 
-await setDoc(doc(db,"races",race),{
+await setDoc(doc(db,"2026_races",race),{
 raceName: race,
 sprint: document.getElementById("sprintToggle").checked
 },{merge:true});
@@ -241,7 +241,7 @@ if(session === "Race" || session === "SprintRace"){
 points = row.cells[3].querySelector("input").value;
 }
 
-await addDoc(collection(db,"races",race,"sessions",session,"results"),{
+await addDoc(collection(db,"2026_races",race,"sessions",session,"results"),{
 
 session:session,
 position:i,
@@ -315,7 +315,7 @@ const races=[
 
 for(const race of races){
 
-const snapshot=await getDocs(collection(db,"races",race,"sessions","Race","results"));
+const snapshot=await getDocs(collection(db,"2026_races",race,"sessions","Race","results"));
 
 if(snapshot.empty) continue;
 
